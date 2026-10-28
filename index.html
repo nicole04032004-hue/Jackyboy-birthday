@@ -235,7 +235,7 @@
             text-align: left;
         }
 
-        /* CUSTOM ARGENTINA & UK FLAG CAKE */
+        /* CUSTOM ARGENTINA & ENGLAND FLAG CAKE */
         .cake-container {
             display: none;
             margin-top: 15px;
@@ -278,11 +278,11 @@
         .flag-side-uk {
             width: 50%;
             height: 100%;
-            background: #cf142b;
+            background: #ffffff;
             position: relative;
             background-image: 
-                linear-gradient(90deg, transparent 40%, #ffffff 40%, #ffffff 60%, transparent 60%),
-                linear-gradient(0deg, transparent 40%, #ffffff 40%, #ffffff 60%, transparent 60%);
+                linear-gradient(90deg, transparent 40%, #ce1124 40%, #ce1124 60%, transparent 60%),
+                linear-gradient(0deg, transparent 40%, #ce1124 40%, #ce1124 60%, transparent 60%);
         }
 
         .candle {
@@ -412,7 +412,7 @@
 
             <!-- STAGE 3: CAKE CEREMONY -->
             <div id="cake-screen" class="cake-container">
-                <div class="flags-bar">🇦🇷 🎂 🇬🇧</div>
+                <div class="flags-bar">🇦🇷 🎂 🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
                 <div class="mc-title">MAKE A WISH JACKIE BOY</div>
                 
                 <div class="pixel-cake" onclick="blowCandle()">
@@ -625,7 +625,7 @@
                 document.getElementById('quest-screen').style.display = 'none';
                 document.getElementById('cake-screen').style.display = 'block';
                 setActiveSlot(4);
-                showAchievement("Argentina & UK Cake Spawned");
+                showAchievement("Argentina & England Cake Spawned");
                 confetti({
                     particleCount: 100,
                     spread: 70,
