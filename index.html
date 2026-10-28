@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy 20th Birthday Jackie Boy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a1008;
+            background-image: 
+                radial-gradient(#2d1e10 15%, transparent 16%),
+                radial-gradient(#2d1e10 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            font-family: 'Press Start 2P', monospace;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .minecraft-container {
+            width: 100%;
+            max-width: 520px;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        /* ACHIEVEMENT POPUP */
+        .achievement {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #212121;
+            border: 4px solid #fff;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 0 #000;
+            z-index: 1000;
+            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .achievement.show {
+            top: 20px;
+        }
+
+        .achievement-icon {
+            width: 36px;
+            height: 36px;
+            background: #55ff55;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            border: 2px solid #00aa00;
+        }
+
+        .achievement-text {
+            text-align: left;
+        }
+
+        .achievement-title {
+            color: #ffff55;
+            font-size: 9px;
+            margin-bottom: 4px;
+        }
+
+        .achievement-desc {
+            color: #ffffff;
+            font-size: 10px;
+        }
+
+        /* HUD - HEARTS & XP */
+        .hud-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 15px;
+            border: 3px solid #3c3c3c;
+        }
+
+        .hearts {
+            display: flex;
+            gap: 4px;
+        }
+
+        .heart {
+            color: #ff2222;
+            font-size: 16px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .level-badge {
+            color: #55ff55;
+            font-size: 11px;
+            text-shadow: 2px 2px #00aa00;
+        }
+
+        /* MAIN CARD FRAME */
+        .mc-card {
+            background-color: #c6c6c6;
+            border: 4px solid #fff;
+            box-shadow: 
+                inset -4px -4px 0px 0px #555555,
+                inset 4px 4px 0px 0px #ffffff,
+                0px 10px 20px rgba(0,0,0,0.8);
+            padding: 20px 15px;
+            color: #3f3f3f;
+            position: relative;
+        }
+
+        .mc-title {
+            color: #3f3f3f;
+            font-size: 11px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0px #ffffff;
+        }
+
+        /* CHEST CONTAINER */
+        .chest-stage {
+            margin: 25px 0;
+            cursor: pointer;
+        }
+
+        .chest-pixel {
+            width: 120px;
+            height: 100px;
+            margin: 0 auto;
+            background: #8b4513;
+            border: 6px solid #000;
+            position: relative;
+            box-shadow: inset -6px -6px 0 #5c2e0b, inset 6px 6px 0 #b85c1a;
+            transition: transform 0.2s;
+        }
+
+        .chest-pixel:hover {
+            transform: scale(1.05);
+        }
+
+        .chest-latch {
+            width: 20px;
+            height: 24px;
+            background: #dedede;
+            border: 3px solid #000;
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: inset -2px -2px 0 #888;
+        }
+
+        .click-hint {
+            font-size: 9px;
+            color: #555;
+            margin-top: 15px;
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-6px); }
+        }
+
+        /* QUEST BOOK CONTENT */
+        .quest-content {
+            display: none;
+            text-align: left;
+            background: #e2d6b5;
+            border: 4px solid #4a3728;
+            padding: 15px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            color: #2c1d11;
+            min-height: 240px;
+            position: relative;
+        }
+
+        .quest-header {
+            font-size: 10px;
+            color: #8b0000;
+            border-bottom: 2px dashed #8b0000;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .quest-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+            font-size: 9px;
+            line-height: 1.8;
+        }
+
+        .quest-list li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .personal-note-text {
+            font-size: 9px;
+            line-height: 1.8;
+            color: #2c1d11;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px dashed #8b4513;
+            padding: 12px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        /* CUSTOM ARGENTINA & UK FLAG CAKE */
+        .cake-container {
+            display: none;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .flags-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .pixel-cake {
+            width: 140px;
+            height: 70px;
+            background: #f0e6d2;
+            border: 4px solid #000;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: inset 0 -20px 0 #8b4513;
+            cursor: pointer;
+        }
+
+        .cake-topping-split {
+            height: 20px;
+            width: 100%;
+            border-bottom: 3px solid #000;
+            display: flex;
+        }
+
+        .flag-side-arg {
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to bottom, #74acdf 33%, #ffffff 33%, #ffffff 66%, #74acdf 66%);
+            border-right: 1px solid #000;
+        }
+
+        .flag-side-uk {
+            width: 50%;
+            height: 100%;
+            background: #cf142b;
+            position: relative;
+            background-image: 
+                linear-gradient(90deg, transparent 40%, #ffffff 40%, #ffffff 60%, transparent 60%),
+                linear-gradient(0deg, transparent 40%, #ffffff 40%, #ffffff 60%, transparent 60%);
+        }
+
+        .candle {
+            width: 8px;
+            height: 22px;
+            background: #fff;
+            border: 2px solid #000;
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .flame {
+            width: 8px;
+            height: 8px;
+            background: #ffcc00;
+            border-radius: 50%;
+            position: absolute;
+            top: -10px;
+            left: 0;
+            animation: flicker 0.3s infinite alternate;
+            box-shadow: 0 0 8px #ffcc00;
+        }
+
+        @keyframes flicker {
+            from { opacity: 0.8; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* NAVIGATION BUTTONS */
+        .btn-mc {
+            background: #707070;
+            border: 3px solid #000;
+            color: #fff;
+            padding: 10px 15px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: inset -3px -3px 0 #383838, inset 3px 3px 0 #a8a8a8;
+            margin-top: 5px;
+        }
+
+        .btn-mc:active {
+            box-shadow: inset 3px 3px 0 #383838, inset -3px -3px 0 #a8a8a8;
+        }
+
+        /* INVENTORY HOTBAR */
+        .hotbar {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 15px;
+            background: #8b8b8b;
+            padding: 4px;
+            border: 3px solid #3c3c3c;
+        }
+
+        .slot {
+            width: 36px;
+            height: 36px;
+            background: #8b8b8b;
+            border: 3px solid #3c3c3c;
+            box-shadow: inset -2px -2px 0 #373737, inset 2px 2px 0 #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 15px;
+        }
+
+        .slot.active {
+            border-color: #2b2b2b;
+            outline: 2px solid #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="achievement" id="achievement">
+        <div class="achievement-icon">🏆</div>
+        <div class="achievement-text">
+            <div class="achievement-title">ADVANCEMENT MADE</div>
+            <div class="achievement-desc" id="achievement-desc">Happy 20th Birthday Jackie Boy</div>
+        </div>
+    </div>
+
+    <div class="minecraft-container">
+        
+        <!-- HUD BAR -->
+        <div class="hud-bar">
+            <div class="hearts">
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+            </div>
+            <div class="level-badge">LVL 20</div>
+        </div>
+
+        <!-- MAIN CONTAINER -->
+        <div class="mc-card">
+            
+            <!-- STAGE 1: CLOSED CHEST -->
+            <div id="chest-screen">
+                <div class="mc-title">A WILD BIRTHDAY CHEST HAS APPEARED FOR JACKIE BOY</div>
+                
+                <div class="chest-stage" onclick="openChest()">
+                    <div class="chest-pixel">
+                        <div class="chest-latch"></div>
+                    </div>
+                </div>
+
+                <div class="click-hint">[ CLICK CHEST TO OPEN ]</div>
+            </div>
+
+            <!-- STAGE 2: QUEST BOOK -->
+            <div id="quest-screen" class="quest-content">
+                <div class="quest-header" id="quest-title">QUEST 1: STATS & UNLOCKED SKILLS</div>
+                <div id="quest-body-container">
+                    <ul class="quest-list" id="quest-body"></ul>
+                </div>
+                
+                <button class="btn-mc" id="next-btn" onclick="nextQuest()">NEXT QUEST ➔</button>
+            </div>
+
+            <!-- STAGE 3: CAKE CEREMONY -->
+            <div id="cake-screen" class="cake-container">
+                <div class="flags-bar">🇦🇷 🎂 🇬🇧</div>
+                <div class="mc-title">MAKE A WISH JACKIE BOY</div>
+                
+                <div class="pixel-cake" onclick="blowCandle()">
+                    <div class="cake-topping-split">
+                        <div class="flag-side-arg"></div>
+                        <div class="flag-side-uk"></div>
+                    </div>
+                    <div class="candle">
+                        <div class="flame" id="flame"></div>
+                    </div>
+                </div>
+
+                <p style="font-size: 8px; margin-top: 15px; color: #555;">(Click the cake to blow out the candle)</p>
+                <button class="btn-mc" onclick="restartQuest()" style="margin-top: 12px;">🔄 READ AGAIN</button>
+            </div>
+
+            <!-- INVENTORY HOTBAR -->
+            <div class="hotbar">
+                <div class="slot active" id="slot-0">📦</div>
+                <div class="slot" id="slot-1">📖</div>
+                <div class="slot" id="slot-2">🫏</div>
+                <div class="slot" id="slot-3">🐱</div>
+                <div class="slot" id="slot-4">🎂</div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let bgMusicTimer = null;
+
+        function startIconicMinecraftMusic() {
+            if (bgMusicTimer) return;
+            
+            // Nostalgic Minecraft melody notes (Sweden inspired motif)
+            const melody = [
+                { f: 329.63, d: 1.2 }, // E4
+                { f: 392.00, d: 1.2 }, // G4
+                { f: 440.00, d: 1.5 }, // A4
+                { f: 493.88, d: 1.8 }, // B4
+                { f: 440.00, d: 1.2 }, // A4
+                { f: 392.00, d: 1.5 }, // G4
+                { f: 329.63, d: 2.0 }  // E4
+            ];
+            
+            let noteIndex = 0;
+
+            function playMinecraftNote() {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
+                const note = melody[noteIndex];
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                // Warm piano/synth ambient tone
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(note.f, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.06, audioCtx.currentTime + 0.3);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + note.d + 1.0);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + note.d + 1.0);
+
+                noteIndex = (noteIndex + 1) % melody.length;
+                bgMusicTimer = setTimeout(playMinecraftNote, (note.d + 1.2) * 1000);
+            }
+
+            playMinecraftNote();
+        }
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'chest') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'click') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } else if (type === 'level') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime + 0.2);
+                osc.frequency.setValueAtTime(700, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.6);
+            }
+        }
+
+        const quests = [
+            {
+                title: "QUEST 1: STATS & UNLOCKED SKILLS",
+                isTextNote: false,
+                items: [
+                    "🎯 <b>20 Years Unlocked:</b> happy birthday Jackie Boy",
+                    "🇦🇷 <b>Latina Patience Level MAX:</b> thanks for putting up with an Argentinean",
+                    "🧠 <b>Decision Helper:</b> thanks for always helping me choose stuff when I can't decide",
+                    "🤝 <b>New Friend Unlocked:</b> funny, patient and handsome guy :)"
+                ],
+                slot: 1
+            },
+            {
+                title: "QUEST 2: LEEDS RULES & MINECRAFT ITEMS",
+                isTextNote: false,
+                items: [
+                    "🫏 <b>Donkey Rule:</b> stay away from random donkey sanctuaries... until I arrive",
+                    "🥊 <b>No Fights:</b> don't start any random fights in Leeds when we meet up",
+                    "🌹 <b>Poppy Flower:</b> a little Minecraft flower for you",
+                    "🐱 <b>Tamable Cat:</b> extra luck for your 20s"
+                ],
+                slot: 2
+            },
+            {
+                title: "QUEST 3: FUTURE GOALS",
+                isTextNote: false,
+                items: [
+                    "✈️ <b>Future Quest:</b> hopefully we actually get to meet up in person someday",
+                    "😄 <b>Keep Laughing:</b> thanks for making me laugh and being a good friend to me",
+                    "💎 <b>Rare Item:</b> a friendship that crafts great memories"
+                ],
+                slot: 3
+            },
+            {
+                title: "QUEST 4: PERSONAL NOTE",
+                isTextNote: true,
+                noteText: "hope you liked this or made you laugh, i don't really understand these tech things much and i argued a lot with chatgpt. anyways, hope you have a great day either with your friends or your family, and have a nice trip with your dad. every day you're getting as old as me, welcome to the 20s stage :)",
+                slot: 3
+            }
+        ];
+
+        let currentQuest = 0;
+
+        function showAchievement(text) {
+            const ach = document.getElementById('achievement');
+            document.getElementById('achievement-desc').innerText = text;
+            ach.classList.add('show');
+            playSound('level');
+            setTimeout(() => {
+                ach.classList.remove('show');
+            }, 3500);
+        }
+
+        function setActiveSlot(index) {
+            for (let i = 0; i < 5; i++) {
+                document.getElementById(`slot-${i}`).classList.remove('active');
+            }
+            document.getElementById(`slot-${index}`).classList.add('active');
+        }
+
+        function openChest() {
+            startIconicMinecraftMusic();
+            playSound('chest');
+            document.getElementById('chest-screen').style.display = 'none';
+            document.getElementById('quest-screen').style.display = 'block';
+            showAchievement("Opened Jackie Boy's Chest");
+            loadQuest(0);
+        }
+
+        function loadQuest(index) {
+            document.getElementById('quest-title').innerHTML = quests[index].title;
+            const container = document.getElementById('quest-body-container');
+            
+            if (quests[index].isTextNote) {
+                container.innerHTML = `<div class="personal-note-text">${quests[index].noteText}</div>`;
+            } else {
+                container.innerHTML = `<ul class="quest-list">${quests[index].items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+            }
+            
+            setActiveSlot(quests[index].slot);
+            
+            if (index === quests.length - 1) {
+                document.getElementById('next-btn').innerText = "[ CLICK TO SPAWN BIRTHDAY CAKE 🎂 ]";
+            } else {
+                document.getElementById('next-btn').innerText = "NEXT QUEST ➔";
+            }
+        }
+
+        function nextQuest() {
+            playSound('click');
+            currentQuest++;
+            if (currentQuest < quests.length) {
+                loadQuest(currentQuest);
+            } else {
+                document.getElementById('quest-screen').style.display = 'none';
+                document.getElementById('cake-screen').style.display = 'block';
+                setActiveSlot(4);
+                showAchievement("Argentina & UK Cake Spawned");
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function blowCandle() {
+            const flame = document.getElementById('flame');
+            if (flame.style.display !== 'none') {
+                flame.style.display = 'none';
+                playSound('level');
+                showAchievement("Wish Granted Jackie Boy 🎂");
+                confetti({
+                    particleCount: 150,
+                    spread: 100,
+                    origin: { y: 0.5 }
+                });
+            }
+        }
+
+        function restartQuest() {
+            playSound('click');
+            currentQuest = 0;
+            document.getElementById('flame').style.display = 'block';
+            document.getElementById('cake-screen').style.display = 'none';
+            document.getElementById('chest-screen').style.display = 'block';
+            setActiveSlot(0);
+        }
+    </script>
+</body>
+</html>
